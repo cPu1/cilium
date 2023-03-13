@@ -1875,13 +1875,12 @@ func runDaemon(d *Daemon, restoredEndpoints *endpointRestoreState, cleaner *daem
 
 	d.startStatusCollector(cleaner)
 
-	go func(errs <-chan error) {
-		err := <-errs
-		if err != nil {
+	go func() {
+		if err := initMetrics(); err != nil {
 			log.WithError(err).Error("Cannot start metrics server")
 			params.Shutdowner.Shutdown(hive.ShutdownWithError(err))
 		}
-	}(initMetrics())
+	}()
 
 	d.startAgentHealthHTTPService()
 	if option.Config.KubeProxyReplacementHealthzBindAddr != "" {
