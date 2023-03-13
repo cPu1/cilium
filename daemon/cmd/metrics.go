@@ -36,15 +36,13 @@ func (h *getMetrics) Handle(params restapi.GetMetricsParams) middleware.Responde
 	return restapi.NewGetMetricsOK().WithPayload(metrics)
 }
 
-func initMetrics() <-chan error {
-	var errs <-chan error
-
+func initMetrics() error {
 	if option.Config.PrometheusServeAddr != "" {
 		log.Infof("Serving prometheus metrics on %s", option.Config.PrometheusServeAddr)
-		errs = metrics.Enable(option.Config.PrometheusServeAddr)
+		return metrics.Enable(option.Config.PrometheusServeAddr)
 	}
 
-	return errs
+	return nil
 }
 
 type bootstrapStatistics struct {

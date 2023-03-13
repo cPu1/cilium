@@ -1608,22 +1608,16 @@ func Unregister(c prometheus.Collector) bool {
 
 // Enable begins serving prometheus metrics on the address passed in. Addresses
 // of the form ":8080" will bind the port on all interfaces.
-func Enable(addr string) <-chan error {
-	errs := make(chan error, 1)
-
-	go func() {
-		// The Handler function provides a default handler to expose metrics
-		// via an HTTP server. "/metrics" is the usual endpoint for that.
-		mux := http.NewServeMux()
-		mux.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
-		srv := http.Server{
-			Addr:    addr,
-			Handler: mux,
-		}
-		errs <- srv.ListenAndServe()
-	}()
-
-	return errs
+func Enable(addr string) error {
+	// The Handler function provides a default handler to expose metrics
+	// via an HTTP server. "/metrics" is the usual endpoint for that.
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	srv := http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}
+	return srv.ListenAndServe()
 }
 
 // GetCounterValue returns the current value
